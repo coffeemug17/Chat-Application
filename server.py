@@ -39,26 +39,30 @@ class ChatServer:
         # Only two clients allowed according to guidelines
         self.server_socket.listen(2)
 
+        # List of client sockets and addresses
         self.client_sockets = []
         self.client_addresses = []
+        self.chat_history = []
 
-        # New thread for each client
+        # New thread for accepting clients
         client1_thread = threading.Thread(target=self.handle_client, args=(0,))
-        client2_thread = threading.Thread(target=self.handle_client, args=(1,))
-
         client1_thread.start()
-        client2_thread.start()  
+        client2_thread = threading.Thread(target=self.handle_client, args=(1,))
+        client2_thread.start()
 
     def handle_client(self, client_number):
         client_socket, client_address = self.server_socket.accept()
-        self.client_sockets.append(client_socket)
-        self.client_addresses.append(client_address)
 
         while True:
             try:
                 message = client_socket.recv(1024).decode()
                 if message:
                     self.message_listbox.insert(END, "Client {}: {}".format(client_number + 1, message))
+
+                    # Send message to other client
+                    for other_socket in self.client_sockets:
+                        if other_socket != client_socket:
+                            other_socket.send("Client {}: {}".format(client_number + 1, message).encode())
             except ConnectionAbortedError:
                 break        
 
