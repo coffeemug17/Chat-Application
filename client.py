@@ -1,8 +1,6 @@
 # Group#: G14
 # Student Names: Mitul Pandey and James Zhang
 
-#Content of client.py; to complete/implement
-
 from tkinter import *
 import socket
 import threading
@@ -23,17 +21,17 @@ class ChatClient:
 
     def setupGUI(self):
         # Here, we will add two labels
-        self.label1 = Label(self.window, text="Client{}".format(current_process().name[-1]))
+        self.label1 = Label(self.window, text="Client{} @port #{}".format(current_process().name[-1], current_process().pid))
         self.label1.pack(padx=0, pady=0, anchor='w')
 
         self.message_label = Label(self.window, text="Message:")
-        self.message_label.pack(padx=0, pady=5, anchor='w', side=LEFT)
-        self.message_entry = Entry(self.window, width=40)
-        self.message_entry.pack(padx=10, pady=5, side=LEFT)
+        self.message_label.pack(padx=0, pady=0, anchor='w', side=TOP)
+        self.message_entry = Entry(self.window, width=20)
+        self.message_entry.pack(padx=10, pady=5, side=TOP)
         self.message_entry.bind("<Return>", lambda x: self.sendMessage())
 
         self.label2 = Label(self.window, text="Chat History:")
-        self.label2.pack(padx=0, pady=0, anchor='w')
+        self.label2.pack(padx=0, pady=0, anchor='w', side=TOP)
 
         self.message_listbox = Listbox(self.window, height=20, width=50)
         self.message_listbox.pack(padx=10, pady=10)
