@@ -50,8 +50,17 @@ class ChatServer:
         client2_thread = threading.Thread(target=self.handle_client, args=(1,))
         client2_thread.start()
 
+    def send_chat_history(self, client_socket):
+        for message in self.chat_history:
+            client_socket.send(message.encode())
+
     def handle_client(self, client_number):
         client_socket, client_address = self.server_socket.accept()
+        self.client_sockets.append(client_socket)
+        self.client_addresses.append(client_address)
+
+        # Send chat history to client
+        self.send_chat_history(client_socket)
 
         while True:
             try:

@@ -38,10 +38,6 @@ class ChatClient:
         self.message_listbox = Listbox(self.window, height=20, width=50)
         self.message_listbox.pack(padx=10, pady=10)
 
-        # self.send_button = Button(self.window, text="Send", command=self.sendMessage)
-        # self.send_button.pack(pady=10)
-
-
     def setupNetwork(self):
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.client_socket.connect(("127.0.0.1", 55555))
