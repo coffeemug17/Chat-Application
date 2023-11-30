@@ -86,6 +86,13 @@ def main(): #Note that the main function is outside the ChatServer class
     ChatServer(window)
     window.mainloop()
     #May add more or modify, if needed
+    try:
+        # Keep the program running
+        while True:
+            pass
+    except KeyboardInterrupt:
+        # Close the server socket
+        print("Server process terminated.")
 
 if __name__ == '__main__': # May be used ONLY for debugging
     main()

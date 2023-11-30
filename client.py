@@ -78,6 +78,13 @@ def main(): #Note that the main function is outside the ChatClient class
     c = ChatClient(window)
     window.mainloop()
     #May add more or modify, if needed 
+    try:
+        # Keep the program running
+        while True:
+            pass
+    except KeyboardInterrupt:
+        # Close the client socket
+        print("Client process terminated.")
 
 if __name__ == '__main__': # May be used ONLY for debugging
     main()
