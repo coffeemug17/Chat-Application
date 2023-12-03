@@ -20,25 +20,45 @@ class ChatClient:
         self.setupNetwork()
 
     def setupGUI(self):
-        # Here, we will add two labels
-        self.label1 = Label(self.window, text="Client{} @port #{}".format(current_process().name[-1], current_process().pid))
-        self.label1.pack(padx=0, pady=0, anchor='w')
+        '''
+        We use tkinters pack geometry manager to arrange basic geometry and use the grid geometry manager to get 
+        the Chat message label and entry box to be on the same row. With the listbox below.
+        '''
 
-        # Here, we will add two labels and two text entry boxes
-        self.message_label = Label(self.window, text="Message:")
-        self.message_label.pack(padx=0, pady=0, anchor='w', side=LEFT)
-        self.message_entry = Entry(self.window, width=20)
-        self.message_entry.pack(padx=10, pady=5, side=LEFT)
+        #Client port label
+        self.label1 = Label(self.window, text="Client{} @port #{}".format(current_process().name[-1], current_process().pid))
+        self.label1.pack(anchor='w')
+
+        #Entry frame
+        entry_frame = Frame(self.window)
+        entry_frame.pack(anchor='w', side=TOP)
+
+        #Chat message label
+        self.message_label = Label(entry_frame, text="Chat message:")
+        self.message_label.grid(row=0, column=0)
+
+        #Chat message entry box
+        self.message_entry = Entry(entry_frame, width=25)
+        self.message_entry.grid(row=0, column=1)
         # Bind the return key to the sendMessage function
         self.message_entry.bind("<Return>", lambda x: self.sendMessage())
 
-        # Here, we will add labels and a listbox for chat history
+        #Chat history label
         self.label2 = Label(self.window, text="Chat History:")
-        self.label2.pack(padx=0, pady=0, anchor='w', side=TOP)
-        self.message_listbox = Listbox(self.window, height=20, width=50)
-        self.message_listbox.pack(padx=10, pady=10)
+        self.label2.pack(anchor='w', side=TOP)
 
-    # Here, we will add a function to setup the network connection
+        #Message history. The height and width are configurable variables because they dominate the size of the GUI
+        #and the width is used to center the message in the listbox
+        self.message_listbox = Listbox(self.window, height=CLIENT_WINDOW_HEIGHT, width=CLIENT_WINDOW_WIDTH)
+        self.message_listbox.pack(side=LEFT, fill=BOTH, expand=True)
+
+        #Scrollbar
+        scrollbar = Scrollbar(self.window, command=self.message_listbox.yview)
+        scrollbar.pack(side=LEFT, fill=Y)
+        self.message_listbox.config(yscrollcommand=scrollbar.set)
+
+
+    #Establish TCP connection
     def setupNetwork(self):
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.client_socket.connect(("127.0.0.1", 55555))
@@ -47,44 +67,44 @@ class ChatClient:
         receive_thread = threading.Thread(target=self.receiveMessage)
         receive_thread.start()
 
-    # Here, we will add a function to send messages
+    #Function for sending messages
     def sendMessage(self):
         message = self.message_entry.get()
-        # Only send message if it is not empty
+        #Only send message if it is not empty
         if message:
-            # Send message to server and display it in chat history box
+            #Send message to server and display it in chat history box
             self.client_socket.send(message.encode())
-            self.displayMessage("You: {}".format(message))
+            self.displayMessage(f"You: {message}")
             self.message_entry.delete(0, END)
     
-    # Here, we will add a function to receive messages from the server
+    #Function for receiving messages from the server
     def receiveMessage(self):
         while True:
             try:
-                # Receive message from server and display it in chat history box
-                message = self.client_socket.recv(1024).decode()
+                #Receive message from server and display it in chat history box
+                #Centre received message
+                message = " "*int(CLIENT_WINDOW_WIDTH/2) + self.client_socket.recv(1024).decode()
                 if message:
                     self.message_listbox.insert(END, message)
             except ConnectionAbortedError:
                 break
     
-    # Here, we will add a function to display messages in the chat history box
+    #Display message in history
     def displayMessage(self, message):
         self.message_listbox.insert(END, message + "\n")
         self.message_listbox.see(END)
 
 def main(): #Note that the main function is outside the ChatClient class
+    #Variables are global so they're accessible in the ChatClient object
+    global CLIENT_WINDOW_HEIGHT
+    global CLIENT_WINDOW_WIDTH
+    CLIENT_WINDOW_HEIGHT = 10
+    CLIENT_WINDOW_WIDTH = 70
+
     window = Tk()
     c = ChatClient(window)
     window.mainloop()
     #May add more or modify, if needed 
-    try:
-        # Keep the program running
-        while True:
-            pass
-    except KeyboardInterrupt:
-        # Close the client socket
-        print("Client process terminated.")
 
 if __name__ == '__main__': # May be used ONLY for debugging
     main()
